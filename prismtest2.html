@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PRISM Synthetic Fingerprinting Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    h1 { color: #60a5fa; }
+    section {
+      margin-bottom: 24px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+    code { background: #020617; padding: 2px 4px; border-radius: 4px; }
+    .status { font-size: 12px; color: #a5b4fc; margin-top: 8px; white-space: pre-line; }
+  </style>
+</head>
+<body>
+  <h1>PRISM Synthetic Fingerprinting Test Page</h1>
+  <p>
+    This page intentionally exercises common browser fingerprinting APIs:
+    Canvas, WebGL, AudioContext, OfflineAudioContext, fonts, screen, navigator,
+    Battery API, and multiple third‑party requests.
+  </p>
+
+  <section>
+    <h2>1. Canvas fingerprinting</h2>
+    <canvas id="canvas" width="300" height="150"></canvas>
+    <div class="status" id="canvasStatus"></div>
+  </section>
+
+  <section>
+    <h2>2. AudioContext & OfflineAudioContext</h2>
+    <div class="status" id="audioStatus"></div>
+  </section>
+
+  <section>
+    <h2>3. WebGL fingerprinting</h2>
+    <div class="status" id="webglStatus"></div>
+  </section>
+
+  <section>
+    <h2>4. Font enumeration</h2>
+    <div class="status" id="fontStatus"></div>
+  </section>
+
+  <section>
+    <h2>5. Screen & Navigator access</h2>
+    <div class="status" id="envStatus"></div>
+  </section>
+
+  <section>
+    <h2>6. Battery API</h2>
+    <div class="status" id="batteryStatus"></div>
+  </section>
+
+  <section>
+    <h2>7. Synthetic third‑party requests</h2>
+    <p>
+      These <code>img</code> and <code>script</code> tags reference typical tracking domains
+      (doubleclick, adsrvr, criteo, etc.) to populate your tracker and cookie metrics.
+    </p>
+    <!-- Images to known tracker domains -->
+    <img src="https://pagead2.googlesyndication.com/pagead/gen_204?id=test1" alt="" style="display:none">
+    <img src="https://securepubads.g.doubleclick.net/gampad/ads?test=1" alt="" style="display:none">
+    <img src="https://match.adsrvr.org/track/test" alt="" style="display:none">
+    <img src="https://pixel.rubiconproject.com/pixel/test" alt="" style="display:none">
+    <img src="https://pixel.quantserve.com/pixel/test" alt="" style="display:none">
+    <img src="https://c.amazon-adsystem.com/aax2/apstag.gif" alt="" style="display:none">
+    <img src="https://sync.taboola.com/test/1.gif" alt="" style="display:none">
+    <img src="https://pixel.tapad.com/test/1.gif" alt="" style="display:none">
+    <img src="https://ups.analytics.yahoo.com/ups/test" alt="" style="display:none">
+
+    <!-- Scripts from tracker domains (will likely be blocked by Brave, but still generate requests) -->
+    <script src="https://static.chartbeat.com/js/chartbeat_test.js" async></script>
+    <script src="https://cdn.optimizely.com/js/0000000000.js" async></script>
+    <script src="https://www.googletagservices.com/tag/js/gpt.js" async></script>
+    <script src="https://connect.facebook.net/en_US/fbevents.js" async></script>
+    <div class="status" id="thirdPartyStatus"></div>
+  </section>
+
+  <script>
+    function logStatus(id, msg) {
+      const el = document.getElementById(id);
+      if (el) el.textContent += msg + "\n";
+    }
+
+    // 1. Canvas fingerprinting
+    (function testCanvas() {
+      try {
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Draw text with font features to maximize entropy
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#e5e7eb";
+        ctx.font = "20px 'Times New Roman'";
+        ctx.fillText("PRISM Fingerprint Test 🕵️", 10, 40);
+        ctx.font = "20px 'Comic Sans MS'";
+        ctx.fillText("Canvas fingerprinting", 10, 80);
+
+        // Trigger your hooks: toDataURL + getImageData
+        const dataUrl = canvas.toDataURL("image/png");
+        const imgData = ctx.getImageData(0, 0, 100, 50);
+
+        logStatus(
+          "canvasStatus",
+          "Canvas toDataURL length: " + dataUrl.length +
+          "\\nCanvas getImageData[0]: " + imgData.data[0]
+        );
+      } catch (e) {
+        logStatus("canvasStatus", "Canvas test failed: " + e);
+      }
+    })();
+
+    // 2. AudioContext & OfflineAudioContext
+    (function testAudio() {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) {
+          const audioCtx = new AC(); // triggers AudioContext
+          const osc = audioCtx.createOscillator();
+          osc.type = "sine";
+          osc.frequency.value = 440;
+          osc.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.01);
+          logStatus("audioStatus", "AudioContext created and oscillator used.");
+        } else {
+          logStatus("audioStatus", "AudioContext not supported.");
+        }
+
+        const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (OAC) {
+          const offlineCtx = new OAC(1, 44100, 44100); // triggers OfflineAudioContext
+          const osc2 = offlineCtx.createOscillator();
+          osc2.connect(offlineCtx.destination);
+          osc2.start(0);
+          offlineCtx.startRendering().then(function() {
+            logStatus("audioStatus", "OfflineAudioContext rendered buffer.");
+          });
+        } else {
+          logStatus("audioStatus", "OfflineAudioContext not supported.");
+        }
+      } catch (e) {
+        logStatus("audioStatus", "Audio test failed: " + e);
+      }
+    })();
+
+    // 3. WebGL fingerprinting
+    (function testWebGL() {
+      try {
+        const canvas = document.createElement("canvas");
+        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        if (!gl) {
+          logStatus("webglStatus", "WebGL not available.");
+          return;
+        }
+
+        const vendor = gl.getParameter(0x1F00); // VENDOR
+        const renderer = gl.getParameter(0x1F01); // RENDERER
+
+        logStatus(
+          "webglStatus",
+          "WebGL VENDOR: " + vendor + "\\nWebGL RENDERER: " + renderer
+        );
+      } catch (e) {
+        logStatus("webglStatus", "WebGL test failed: " + e);
+      }
+    })();
+
+    // 4. Font enumeration
+    (function testFonts() {
+      try {
+        if (document.fonts && document.fonts.check) {
+          const fontsToCheck = [
+            '16px "Times New Roman"',
+            '16px "Arial"',
+            '16px "Courier New"',
+            '16px "Comic Sans MS"',
+            '16px "NonExistentFont12345"'
+          ];
+          fontsToCheck.forEach(spec => {
+            const available = document.fonts.check(spec);
+            logStatus("fontStatus", spec + " available: " + available);
+          });
+        } else {
+          logStatus("fontStatus", "document.fonts.check not supported.");
+        }
+      } catch (e) {
+        logStatus("fontStatus", "Font test failed: " + e);
+      }
+    })();
+
+    // 5. Screen & Navigator
+    (function testEnv() {
+      try {
+        let msg = "";
+        // Read screen properties multiple times to trigger your threshold
+        for (let i = 0; i < 6; i++) {
+          msg += `Read ${i + 1}: ${screen.width}x${screen.height}, depth=${screen.colorDepth}\\n`;
+        }
+
+        msg += "\\nNavigator properties:\\n";
+        msg += "userAgent: " + navigator.userAgent + "\\n";
+        msg += "platform: " + navigator.platform + "\\n";
+        msg += "language: " + navigator.language + "\\n";
+        msg += "languages: " + (navigator.languages || []).join(",") + "\\n";
+        msg += "hardwareConcurrency: " + navigator.hardwareConcurrency + "\\n";
+        msg += "deviceMemory: " + navigator.deviceMemory + "\\n";
+        msg += "maxTouchPoints: " + navigator.maxTouchPoints + "\\n";
+
+        logStatus("envStatus", msg);
+      } catch (e) {
+        logStatus("envStatus", "Env test failed: " + e);
+      }
+    })();
+
+    // 6. Battery API
+    (function testBattery() {
+      try {
+        if (navigator.getBattery) {
+          navigator.getBattery().then(battery => {
+            logStatus(
+              "batteryStatus",
+              "Battery level: " + (battery.level * 100) + "%, charging: " + battery.charging
+            );
+          }).catch(e => {
+            logStatus("batteryStatus", "getBattery promise rejected: " + e);
+          });
+        } else {
+          logStatus("batteryStatus", "navigator.getBattery not supported.");
+        }
+      } catch (e) {
+        logStatus("batteryStatus", "Battery test failed: " + e);
+      }
+    })();
+
+    // 7. Synthetic third‑party requests
+    (function thirdParty() {
+      logStatus(
+        "thirdPartyStatus",
+        "Issued multiple image/script requests to common tracking domains; " +
+        "your extension should record third‑party requests and trackers."
+      );
+    })();
+  </script>
+</body>
+</html>

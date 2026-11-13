@@ -1,0 +1,9 @@
+file,domain,timestamp,tracker_count,fingerprint_count,third_party_cookie_count,third_party_request_count,risk_score,unique_tracker_domains,tracker_events,fingerprint_events,note
+prism-cs231n.github.io-1766081317713.json,cs231n.github.io,2025-12-18T18:08:37.713Z,3,0,1096,11,26,3,8,0,Research data export - no personal information included
+prism-edition.cnn.com-1766081349527.json,edition.cnn.com,2025-12-18T18:09:09.527Z,31,0,1103,220,60,31,56,0,Research data export - no personal information included
+prism-edition.cnn.com-1766081374162.json,edition.cnn.com,2025-12-18T18:09:34.162Z,61,0,1059,622,60,61,100,0,Research data export - no personal information included
+prism-edition.cnn.com-1766081395499.json,edition.cnn.com,2025-12-18T18:09:55.496Z,61,0,1058,734,60,61,100,0,Research data export - no personal information included
+prism-teams.microsoft.com-1766081244378.json,teams.microsoft.com,2025-12-18T18:07:24.378Z,0,0,1093,36,20,0,0,0,Research data export - no personal information included
+prism-www.hotjar.com-1765999476981.json,www.hotjar.com,2025-12-17T19:24:36.980Z,0,0,1078,53,0,0,0,0,Research data export - no personal information included
+prism-www.youtube.com-1766081291810.json,www.youtube.com,2025-12-18T18:08:11.810Z,2,0,1095,37,24,2,2,0,Research data export - no personal information included
+prism-x.com-1766081191800.json,x.com,2025-12-18T18:06:31.800Z,1,0,1090,3,22,1,3,0,Research data export - no personal information included

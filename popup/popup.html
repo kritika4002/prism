@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISM - Privacy Risk Inspector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>PRISM</span>
+      </div>
+      <div class="domain" id="currentDomain">Loading...</div>
+    </div>
+
+    <!-- Risk Score Display -->
+    <div class="risk-card">
+      <div class="risk-label">Privacy Risk Score</div>
+      <div class="risk-score-container">
+        <svg class="risk-circle" width="120" height="120">
+          <circle cx="60" cy="60" r="50" class="risk-bg"></circle>
+          <circle cx="60" cy="60" r="50" class="risk-progress" id="riskCircle"></circle>
+        </svg>
+        <div class="risk-score-value">
+          <span id="riskScore">0</span>
+          <span class="risk-score-max">/100</span>
+        </div>
+      </div>
+      <div class="risk-level" id="riskLevel">No Risk</div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon tracker-icon">🎯</div>
+        <div class="metric-value" id="trackerCount">0</div>
+        <div class="metric-label">Trackers</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon fingerprint-icon">👆</div>
+        <div class="metric-value" id="fingerprintCount">0</div>
+        <div class="metric-label">Fingerprints</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon cookie-icon">🍪</div>
+        <div class="metric-value" id="cookieCount">0</div>
+        <div class="metric-label">3rd Party Cookies</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon request-icon">📡</div>
+        <div class="metric-value" id="requestCount">0</div>
+        <div class="metric-label">3rd Party Requests</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="events">Events</button>
+      <button class="tab" data-tab="trackers">Trackers</button>
+    </div>
+
+    <!-- Tab Content: Events -->
+    <div class="tab-content active" id="eventsTab">
+      <div class="events-list" id="eventsList">
+        <div class="empty-state">No privacy events detected yet</div>
+      </div>
+    </div>
+
+    <!-- Tab Content: Trackers -->
+    <div class="tab-content" id="trackersTab">
+      <div class="trackers-list" id="trackersList">
+        <div class="empty-state">No trackers detected</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-secondary" id="refreshBtn">
+        <span>↻</span> Refresh
+      </button>
+      <button class="btn btn-secondary" id="exportBtn">
+        <span>⤓</span> Export
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span class="footer-text">Privacy-by-Design • Local Processing Only</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../export.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
